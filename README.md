@@ -1,2 +1,2 @@
 # Macrolinguistics
-Introduction to Sociolinguistics, Pyscholinguistics, computational linguistics etc.
+Introduction to Sociolinguistics, Psycholinguistics, computational linguistics, etc.
