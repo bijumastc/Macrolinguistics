@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Macro Twin — Introduction to Macrolinguistics</title>
+<style>
+:root {
+  --bg: #f5f5f5; --card: #ffffff; --text: #212121; --muted: #757575;
+  --border: #e0e0e0; --accent: #0d47a1; --accent2: #1565c0;
+  --good: #2e7d32; --avg: #f57f17; --weak: #c62828;
+  --radius: 14px; --shadow: 0 2px 12px rgba(0,0,0,.08);
+  --input-bg: #fafafa; --set1: #6a1b9a; --set2: #00695c;
+  --fg: #374151;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#181a20;--card:#23262f;--text:#e8e8e8;--muted:#9e9e9e;
+  --border:#333;--accent:#64b5f6;--accent2:#90caf9;--good:#66bb6a;
+  --avg:#ffa726;--weak:#ef5350;--shadow:0 2px 12px rgba(0,0,0,.3);
+  --input-bg:#2a2d36;--set1:#ce93d8;--set2:#4db6ac;--fg:#e8e8e8;}
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.screen{display:none;max-width:860px;margin:0 auto;padding:20px 16px 40px;}
+.screen.active{display:block;}
+.app-header{text-align:center;padding:28px 16px 12px;}
+.app-header h1{font-size:1.7rem;font-weight:800;color:var(--accent);}
+.app-header p{color:var(--muted);font-size:.95rem;margin-top:4px;}
+.home-grid{display:grid;gap:14px;margin-top:20px;}
+.home-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 18px;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.home-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.home-card h3{font-size:1.05rem;margin-bottom:4px;}
+.home-card p{color:var(--muted);font-size:.85rem;margin-top:2px;}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;
+  color:#fff;margin-left:6px;vertical-align:middle;font-weight:600;}
+.btn{display:inline-block;padding:10px 22px;border-radius:8px;border:none;
+  font-size:.95rem;font-weight:600;cursor:pointer;transition:background .2s,transform .1s;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-outline{background:transparent;border:2px solid var(--accent);color:var(--accent);}
+.btn-outline:hover{background:var(--accent);color:#fff;}
+.btn-sm{padding:6px 14px;font-size:.82rem;}
+.btn-good{background:var(--good);color:#fff;}
+.btn-weak{background:var(--weak);color:#fff;}
+.name-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:32px 24px;max-width:440px;margin:40px auto;text-align:center;}
+.name-form h2{color:var(--accent);margin-bottom:6px;}
+.name-form p{color:var(--muted);font-size:.9rem;margin-bottom:18px;}
+.name-form input{width:100%;padding:12px 14px;margin-bottom:12px;border:1px solid var(--border);
+  border-radius:8px;font-size:1rem;background:var(--input-bg);color:var(--text);}
+.name-form input:focus{outline:none;border-color:var(--accent);}
+.nav-back{margin-bottom:12px;}
+.progress-bar-wrap{background:var(--border);border-radius:6px;height:8px;margin:12px 0 20px;overflow:hidden;}
+.progress-bar-fill{height:100%;border-radius:6px;transition:width .4s ease;}
+
+/* MCQ */
+.mcq-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px 20px;margin-bottom:16px;}
+.mcq-card .q-num{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+.mcq-card .q-text{font-size:1.02rem;font-weight:600;margin-bottom:14px;line-height:1.5;}
+.mcq-option{display:block;width:100%;text-align:left;padding:12px 16px;margin-bottom:8px;
+  border:2px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);
+  font-size:.95rem;cursor:pointer;transition:border-color .2s,background .2s;}
+.mcq-option:hover:not(.chosen){border-color:var(--accent);background:rgba(13,71,161,.05);}
+.mcq-option.chosen.correct{border-color:var(--good);background:rgba(46,125,50,.1);}
+.mcq-option.chosen.wrong{border-color:var(--weak);background:rgba(198,40,40,.1);}
+.mcq-option.reveal-correct{border-color:var(--good);background:rgba(46,125,50,.08);}
+.mcq-option.chosen .opt-icon,.mcq-option.reveal-correct .opt-icon{display:inline;}
+.opt-icon{display:none;margin-right:6px;}
+.mcq-feedback{margin-top:10px;padding:12px 16px;border-radius:10px;font-size:.9rem;
+  line-height:1.5;display:none;}
+.mcq-feedback.show{display:block;}
+.mcq-feedback.correct-fb{background:rgba(46,125,50,.1);border-left:4px solid var(--good);}
+.mcq-feedback.wrong-fb{background:rgba(198,40,40,.1);border-left:4px solid var(--weak);}
+.mcq-option:disabled{cursor:default;opacity:.85;}
+
+/* Short & Long Answer */
+.sa-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px 20px;margin-bottom:16px;}
+.sa-card .q-num{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+.sa-card .q-text{font-size:1.02rem;font-weight:600;margin-bottom:6px;line-height:1.5;}
+.sa-card .q-marks{font-size:.78rem;color:var(--accent);font-weight:700;margin-bottom:12px;}
+.sa-card .q-hint{font-size:.85rem;color:var(--muted);margin-bottom:12px;font-style:italic;
+  padding:8px 12px;background:rgba(13,71,161,.04);border-radius:8px;border-left:3px solid var(--accent);}
+.sa-textarea{width:100%;min-height:80px;padding:12px 14px;border:1px solid var(--border);
+  border-radius:8px;font-size:.92rem;font-family:inherit;background:var(--input-bg);color:var(--text);
+  resize:vertical;line-height:1.6;}
+.sa-textarea:focus{outline:none;border-color:var(--accent);}
+.sa-textarea.long{min-height:160px;}
+.sa-submit-btn{margin-top:10px;padding:8px 18px;border-radius:8px;border:none;
+  font-size:.88rem;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;
+  transition:background .2s,transform .1s;}
+.sa-submit-btn:hover{background:var(--accent2);}
+.sa-submit-btn:active{transform:scale(.97);}
+.sa-submit-btn:disabled{opacity:.5;cursor:default;}
+.sa-feedback{margin-top:12px;padding:14px 16px;border-radius:10px;font-size:.9rem;
+  line-height:1.6;display:none;border-left:4px solid var(--good);background:rgba(46,125,50,.06);}
+.sa-feedback.show{display:block;}
+.sa-feedback h4{color:var(--good);margin-bottom:6px;font-size:.92rem;}
+.sa-feedback .model-answer{background:rgba(13,71,161,.05);padding:10px 14px;border-radius:8px;
+  margin-top:8px;font-size:.88rem;line-height:1.6;}
+.sa-feedback .self-rate{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.sa-feedback .self-rate p{font-size:.85rem;color:var(--muted);margin-bottom:8px;font-weight:600;}
+.rate-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.rate-btn{padding:6px 14px;border-radius:8px;border:2px solid var(--border);background:var(--card);
+  color:var(--text);font-size:.82rem;cursor:pointer;font-weight:600;transition:border-color .2s,background .2s;}
+.rate-btn:hover{border-color:var(--accent);}
+.rate-btn.selected{border-color:var(--good);background:rgba(46,125,50,.1);color:var(--good);}
+.rate-btn:disabled{cursor:default;opacity:.7;}
+
+/* Results */
+.result-header{text-align:center;margin-bottom:20px;}
+.score-ring{width:110px;height:110px;border-radius:50%;border:6px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;margin:16px auto;
+  font-size:1.6rem;font-weight:800;color:var(--accent);}
+.score-pct{font-size:1.3rem;font-weight:700;color:var(--accent);text-align:center;}
+.grade-text{font-size:1.1rem;font-weight:700;text-align:center;margin:6px 0;}
+.grade-msg{text-align:center;color:var(--muted);font-size:.95rem;margin-bottom:16px;line-height:1.5;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:12px 0;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:16px;text-align:center;}
+.stat-num{font-size:1.5rem;font-weight:800;}
+.stat-label{font-size:.78rem;color:var(--muted);margin-top:2px;}
+.topic-strength{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.88rem;}
+.bar-bg{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:5px;transition:width .5s ease;}
+.bar-fill.strong{background:var(--good);}
+.bar-fill.medium{background:var(--avg);}
+.bar-fill.weak{background:var(--weak);}
+.encourage-box{background:var(--card);border:2px solid var(--accent);border-radius:var(--radius);
+  padding:20px;margin:20px 0;text-align:center;}
+.encourage-box .emoji{font-size:2rem;margin-bottom:8px;}
+.encourage-box h3{color:var(--accent);margin-bottom:6px;}
+.encourage-box p{color:var(--muted);font-size:.92rem;line-height:1.5;}
+.next-step-box{background:rgba(13,71,161,.06);border-radius:10px;padding:16px;margin-top:14px;}
+.next-step-box h3{color:var(--accent);font-size:1rem;margin-bottom:8px;}
+.next-step-box ol{padding-left:20px;}
+.next-step-box li{margin-bottom:4px;font-size:.9rem;}
+
+/* Dashboard */
+.dash-login{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:32px 24px;max-width:400px;margin:40px auto;text-align:center;}
+.dash-login input{width:100%;padding:12px 14px;margin-bottom:12px;border:1px solid var(--border);
+  border-radius:8px;font-size:1rem;background:var(--input-bg);color:var(--text);}
+.dash-login input:focus{outline:none;border-color:var(--accent);}
+.dash-table-wrap{overflow-x:auto;margin-top:16px;}
+table.dash-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.dash-table th,.dash-table td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--border);}
+.dash-table th{background:var(--accent);color:#fff;font-weight:600;position:sticky;top:0;}
+.dash-table tr:hover{background:rgba(13,71,161,.04);}
+.dash-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:16px 0;}
+
+/* Learn */
+.learn-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:12px;overflow:hidden;}
+.learn-header{padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:10px;
+  transition:background .15s;}
+.learn-header:hover{background:rgba(13,71,161,.04);}
+.learn-header .lh-icon{font-size:1.3rem;}
+.learn-header .lh-title{flex:1;font-weight:700;font-size:1rem;}
+.learn-header .lh-arrow{color:var(--muted);transition:transform .25s;font-size:.9rem;}
+.learn-header.open .lh-arrow{transform:rotate(180deg);}
+.learn-body{display:none;padding:0 20px 18px;font-size:.92rem;line-height:1.7;}
+.learn-body.open{display:block;}
+.learn-body h4{color:var(--accent);margin:12px 0 4px;font-size:.95rem;}
+.learn-body ul,.learn-body ol{padding-left:20px;margin:4px 0 8px;}
+.learn-body li{margin-bottom:3px;}
+.learn-body .example{background:rgba(13,71,161,.05);border-left:3px solid var(--accent);
+  padding:8px 12px;border-radius:0 8px 8px 0;margin:6px 0;font-size:.88rem;}
+.learn-body .key-point{background:rgba(13,71,161,.08);border-radius:8px;padding:8px 12px;
+  margin:6px 0;font-size:.88rem;border-left:3px solid var(--accent);}
+.learn-body .summary-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:10px 0;}
+.learn-body .summary-table th,.learn-body .summary-table td{padding:8px;text-align:left;
+  border:1px solid var(--border);}
+.learn-body .summary-table th{background:var(--accent);color:#fff;font-weight:600;}
+.learn-body .summary-table tr:nth-child(even){background:rgba(13,71,161,.03);}
+.app-footer{text-align:center;padding:20px;color:var(--muted);font-size:.78rem;margin-top:20px;}
+@media(max-width:600px){
+  .app-header h1{font-size:1.35rem;}
+  .mcq-card,.sa-card{padding:16px 14px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .topic-strength{flex-wrap:wrap;}
+  .topic-strength span:first-child{min-width:100%!important;margin-bottom:2px;}
+  .rate-btns{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="homeScreen" class="screen active">
+  <div class="app-header">
+    <h1>🌍 Macro Twin</h1>
+    <p>Your Digital Learning Companion for Introduction to Macrolinguistics</p>
+  </div>
+  <div class="home-grid">
+    <div class="home-card" onclick="showLearn()">
+      <h3 style="color:var(--accent)">📚 Learn Macrolinguistics</h3>
+      <p>Study the 13 branches of macrolinguistics with key ideas, examples, famous linguists and important books.</p>
+    </div>
+    <div class="home-card" onclick="startTest(1)">
+      <h3 style="color:var(--set1)">📝 Set 1 — MCQ <span class="badge" style="background:var(--set1)">25 × 1 mark</span></h3>
+      <p>25 multiple-choice questions across all branches. Select the correct answer — instant feedback and explanations.</p>
+    </div>
+    <div class="home-card" onclick="startTest(2)">
+      <h3 style="color:var(--set2)">✍️ Set 2 — Short & Long Answer <span class="badge" style="background:var(--set2)">50 marks</span></h3>
+      <p>10 short-answer questions (2 marks each) + 6 long-answer questions (5 marks each). Write, submit, compare with model answer, then self-rate.</p>
+    </div>
+    <div class="home-card" onclick="showDashLogin()">
+      <h3 style="color:var(--accent)">📊 Teacher Dashboard</h3>
+      <p>View all student results, scores and analytics. Teacher login required.</p>
+    </div>
+  </div>
+  <div class="app-footer">Macro Twin · Introduction to Macrolinguistics · 2024</div>
+</div>
+
+<!-- LEARN -->
+<div id="learnScreen" class="screen">
+  <div class="nav-back"><button class="btn btn-outline btn-sm" onclick="goHome()">← Back</button></div>
+  <h2 style="color:var(--accent);margin-bottom:4px;">📚 Learn Macrolinguistics</h2>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:16px;">Tap any topic to expand. Study all 13 branches before attempting the tests.</p>
+  <div id="learnContent"></div>
+</div>
+
+<!-- NAME ENTRY -->
+<div id="nameScreen" class="screen">
+  <div class="nav-back"><button class="btn btn-outline btn-sm" onclick="goHome()">← Back</button></div>
+  <div class="name-form">
+    <h2>Enter Your Details</h2>
+    <p>Your name and roll number will be recorded with your test results.</p>
+    <input type="text" id="studentRollNo" placeholder="Roll No (e.g. 2024ENG001)" maxlength="50">
+    <input type="text" id="studentName" placeholder="Full Name" maxlength="100">
+    <br>
+    <button class="btn btn-primary" onclick="beginTest()">Start Test</button>
+  </div>
+</div>
+
+<!-- TEST -->
+<div id="testScreen" class="screen">
+  <div class="nav-back">
+    <button class="btn btn-outline btn-sm" onclick="confirmExit()">← Exit Test</button>
+    <span style="float:right;color:var(--muted);font-size:.85rem" id="testProgress">0/0</span>
+  </div>
+  <h2 style="color:var(--accent);margin-bottom:4px;" id="testTitle"></h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:4px;" id="testSubtitle"></p>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="testBar" style="width:0%"></div></div>
+  <div id="testContent"></div>
+  <div style="text-align:center;margin-top:20px;">
+    <button class="btn btn-primary" id="testSubmitBtn" onclick="finishTest()" style="display:none;">Submit Test & View Results</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsScreen" class="screen">
+  <div class="nav-back"><button class="btn btn-outline btn-sm" onclick="goHome()">← Home</button></div>
+  <div id="resultsContent"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardScreen" class="screen">
+  <div class="nav-back"><button class="btn btn-outline btn-sm" onclick="goHome()">← Home</button></div>
+  <h2 style="color:var(--accent);margin-bottom:16px;">📊 Teacher Dashboard</h2>
+  <div id="dashContent">
+    <div class="dash-login">
+      <h3 style="color:var(--accent);margin-bottom:12px;">Teacher Login</h3>
+      <input type="text" id="dashUser" placeholder="Username">
+      <input type="password" id="dashPass" placeholder="Password">
+      <br>
+      <button class="btn btn-primary" onclick="dashLogin()">Login</button>
+      <p id="dashError" style="color:var(--weak);font-size:.85rem;margin-top:8px;display:none;"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const SHEET_URL = '';  // Paste your Google Apps Script web-app URL here
+
+// ===== TOPICS =====
+const TOPICS = {
+  sociolinguistics: { name:'Sociolinguistics', icon:'🏘️' },
+  anthropological: { name:'Anthropological Linguistics', icon:'🌏' },
+  graphemics: { name:'Graphemics', icon:'✍️' },
+  neurolinguistics: { name:'Neurolinguistics', icon:'🧠' },
+  psycholinguistics: { name:'Psycholinguistics', icon:'💭' },
+  cognitive: { name:'Cognitive Linguistics', icon:'💡' },
+  biolinguistics: { name:'Biolinguistics', icon:'🧬' },
+  developmental: { name:'Developmental Linguistics', icon:'👶' },
+  historical: { name:'Historical Linguistics', icon:'📜' },
+  stylistics: { name:'Stylistics', icon:'🎭' },
+  ethnolinguistics: { name:'Ethnolinguistics', icon:'🪘' },
+  philosophy: { name:'Philosophy of Language', icon:'🤔' },
+  computational: { name:'Computational Linguistics', icon:'💻' }
+};
+
+// ===== LEARN DATA =====
+const LEARN_DATA = [
+  { topic:'sociolinguistics', title:'1. Sociolinguistics — Language and Society',
+    content:`<p><strong>Sociolinguistics</strong> studies the two-way relationship between language and society. It begins from a simple observation: no two people speak in exactly the same way, and even one person speaks differently in different situations.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Language variation:</strong> features of sound, word and grammar differ across groups. In Labov's New York study, pronouncing the /r/ in "fourth floor" rose with social class and formality.</li>
+<li><strong>Speech community & dialect:</strong> a group sharing norms of language use. Everyone speaks a dialect — there is no "accent-less" English.</li>
+<li><strong>Register & style:</strong> we adjust language to the situation — job interview vs. friends.</li>
+<li><strong>Code-switching & bilingualism:</strong> moving between languages or varieties within a conversation — common in multilingual contexts (e.g., Malayalam–English "Manglish").</li>
+<li><strong>Prestige & identity:</strong> standard varieties carry "overt" prestige; non-standard forms can carry "covert" prestige as badges of group loyalty.</li>
+<li><strong>Language & power:</strong> who decides what counts as "correct"? Links language to class, gender and social inequality.</li>
+</ul>
+<div class="example"><strong>Example:</strong> In Labov's department-store study, speakers in higher-end stores used more /r/ pronunciation, showing the link between language and social stratification.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>William Labov</strong> — founder of variationist sociolinguistics</li><li><strong>Dell Hymes</strong> — communicative competence</li><li><strong>Basil Bernstein</strong> — restricted and elaborated codes</li><li><strong>Peter Trudgill, Deborah Tannen, Janet Holmes</strong></li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Sociolinguistic Patterns</em> — William Labov (1972)</li><li><em>Sociolinguistics: An Introduction</em> — Peter Trudgill</li><li><em>An Introduction to Sociolinguistics</em> — Janet Holmes</li></ul>`},
+
+  { topic:'anthropological', title:'2. Anthropological Linguistics — Language and Culture',
+    content:`<p><strong>Anthropological linguistics</strong> studies language as part of human culture, usually through close, first-hand fieldwork. It grew out of anthropology when scholars realised you cannot truly understand a people without understanding their language.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Fieldwork & documentation:</strong> producing grammars, dictionaries and recorded texts for under-studied and endangered languages.</li>
+<li><strong>Language describes its world:</strong> a community's vocabulary mirrors what matters to it — kinship, plants, landscape, tools, rituals.</li>
+<li><strong>Linguistic relativity (Sapir–Whorf):</strong> the idea that language structure may influence habitual thought — e.g., how a language handles time, space or evidentiality.</li>
+<li><strong>Each language on its own terms:</strong> rejecting the assumption that English or Latin grammar is the universal model.</li>
+</ul>
+<div class="example"><strong>Example:</strong> The Hopi language reportedly lacks tense markers for past/present/future, which Whorf argued shapes how Hopi speakers conceptualise time differently from English speakers.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Franz Boas</strong> — founder; insisted each language be described in its own terms</li><li><strong>Edward Sapir</strong> — linked language, culture and personality</li><li><strong>Benjamin Lee Whorf</strong> — linguistic relativity hypothesis</li><li><strong>Bronisław Malinowski</strong> — "context of situation"</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Handbook of American Indian Languages</em> — Franz Boas (1911)</li><li><em>Language</em> — Edward Sapir (1921)</li><li><em>Language, Thought, and Reality</em> — B. L. Whorf (1956)</li></ul>`},
+
+  { topic:'graphemics', title:'3. Graphemics — The Study of Writing Systems',
+    content:`<p><strong>Graphemics</strong> is the linguistic study of writing — the visible, written form of language. Just as phonology studies sounds, graphemics studies written symbols: how they are organised, how they relate to sounds and meanings.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Grapheme:</strong> the smallest distinctive unit of a writing system — the written counterpart of the phoneme. In English: letters like <em>c, a, t</em>.</li>
+<li><strong>Allographs:</strong> different shapes of the same grapheme — capital <em>A</em> and small <em>a</em>, print and cursive.</li>
+<li><strong>Types of writing system:</strong> alphabetic (English), abugida/syllabic (Malayalam, Devanagari), logographic (Chinese characters).</li>
+<li><strong>Orthography:</strong> the agreed spelling and writing conventions. English orthography is famously irregular — <em>cough, though, through</em>.</li>
+<li><strong>Sound–spelling mismatch:</strong> writing rarely maps neatly onto pronunciation, which is why phonetics uses the IPA.</li>
+</ul>
+<div class="example"><strong>Example:</strong> In English, the grapheme &lt;c&gt; represents /k/ in "cat" but /s/ in "city" — showing the complex relationship between graphemes and phonemes.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>I. J. Gelb</strong> — pioneer of grammatology</li><li><strong>Geoffrey Sampson</strong> & <strong>Henry Rogers</strong> — classifications of writing systems</li><li><strong>Florian Coulmas</strong> — reference works on writing</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>A Study of Writing</em> — I. J. Gelb (1952)</li><li><em>Writing Systems</em> — Geoffrey Sampson (1985)</li><li><em>Writing Systems: A Linguistic Approach</em> — Henry Rogers</li></ul>`},
+
+  { topic:'neurolinguistics', title:'4. Neurolinguistics — Language and the Brain',
+    content:`<p><strong>Neurolinguistics</strong> studies how language is stored, processed and produced in the human brain. It combines linguistics with neurology, asking which brain regions handle sounds, words, grammar and meaning.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Broca's area:</strong> left frontal lobe; damage → <strong>Broca's (non-fluent) aphasia</strong> — slow, effortful, telegraphic speech, but comprehension is relatively preserved.</li>
+<li><strong>Wernicke's area:</strong> left temporal lobe; damage → <strong>Wernicke's (fluent) aphasia</strong> — speech flows easily but is often meaningless, with poor comprehension.</li>
+<li><strong>Lateralisation:</strong> in most people, language is handled chiefly by the left hemisphere.</li>
+<li><strong>Aphasia as evidence:</strong> different injuries damage different abilities, showing the brain treats sound, grammar and meaning as partly separate systems.</li>
+<li><strong>Modern imaging:</strong> fMRI and EEG reveal where and when language processing happens.</li>
+<li><strong>Critical period:</strong> Lenneberg's idea of a biologically favourable early window for acquiring language.</li>
+</ul>
+<div class="key-point"><strong>Key Point:</strong> Broca's aphasia affects production (grammar), Wernicke's aphasia affects comprehension (meaning) — showing different brain areas handle different language functions.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Paul Broca</strong> & <strong>Carl Wernicke</strong> — discovered the brain's language areas</li><li><strong>Roman Jakobson</strong> — connected aphasia to linguistic structure</li><li><strong>Eric Lenneberg</strong> — biological basis & critical period</li><li><strong>Angela Friederici</strong> — brain and grammar</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Biological Foundations of Language</em> — Eric Lenneberg (1967)</li><li><em>Introduction to Neurolinguistics</em> — Elisabeth Ahlsén</li></ul>`},
+
+  { topic:'psycholinguistics', title:'5. Psycholinguistics — Language and the Mind',
+    content:`<p><strong>Psycholinguistics</strong> studies mental processes underlying language: how we understand speech, plan sentences, store and retrieve words, and how children acquire language. It sits at the meeting point of linguistics and psychology.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Comprehension:</strong> the mind instantly turns sound into words and structures, resolving ambiguity on the fly — "The horse raced past the barn fell" briefly trips us up.</li>
+<li><strong>Production:</strong> slips of the tongue like "the queer old dean" (for "dear old queen") reveal hidden stages of speech planning.</li>
+<li><strong>The mental lexicon:</strong> our internal "dictionary" of tens of thousands of words, searched in a fraction of a second.</li>
+<li><strong>Acquisition — the wug test:</strong> shown a creature called a "wug," children say "two wugs" — proving they apply rules, not just imitate (Berko Gleason).</li>
+<li><strong>Bilingual processing:</strong> how two languages are stored, kept apart, and switched between.</li>
+</ul>
+<div class="example"><strong>Example:</strong> The "wug test" — a child who has never heard "wugs" still says it, proving children internalise morphological rules rather than memorising word forms.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>George Miller</strong> — "the magical number seven"</li><li><strong>Steven Pinker</strong> — language as instinct</li><li><strong>Jean Berko Gleason</strong> — the wug test</li><li><strong>Willem Levelt</strong> — speech production model</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>The Language Instinct</em> — Steven Pinker (1994)</li><li><em>The Articulate Mammal</em> — Jean Aitchison</li><li><em>Speaking: From Intention to Articulation</em> — Willem Levelt (1989)</li></ul>`},
+
+  { topic:'cognitive', title:'6. Cognitive Linguistics — Language and Thought',
+    content:`<p><strong>Cognitive linguistics</strong> treats language as part of general human cognition, not a separate "module." The way we talk reflects how we perceive, categorise and experience the world — especially through our bodies.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Conceptual metaphor:</strong> abstract ideas understood through concrete ones — "TIME IS MONEY" (we <em>spend, save, waste</em> time); "ARGUMENT IS WAR" (we <em>defend, attack</em> positions).</li>
+<li><strong>Embodiment:</strong> meaning is grounded in physical experience — "feeling <em>up/down</em>" for moods, a "<em>warm</em> person," "<em>grasping</em> an idea."</li>
+<li><strong>Prototype theory (Rosch):</strong> categories have central and marginal members — a sparrow is a "better" bird than a penguin; categories have fuzzy edges.</li>
+<li><strong>Frames (Fillmore):</strong> a word evokes a background scene — "buy" calls up buyer, seller, goods and money.</li>
+<li><strong>Construction grammar:</strong> form and meaning are learned together as ready-made patterns.</li>
+</ul>
+<div class="key-point"><strong>Key Point:</strong> Cognitive linguistics argues that grammar itself is meaningful and that abstract thinking is built on concrete bodily experience via metaphor.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>George Lakoff</strong> & <strong>Mark Johnson</strong> — conceptual metaphor theory</li><li><strong>Ronald Langacker</strong> — Cognitive Grammar</li><li><strong>Eleanor Rosch</strong> — prototype theory</li><li><strong>Charles Fillmore</strong> — frame semantics</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Metaphors We Live By</em> — Lakoff & Johnson (1980)</li><li><em>Women, Fire, and Dangerous Things</em> — Lakoff (1987)</li><li><em>Cognitive Linguistics</em> — Croft & Cruse</li></ul>`},
+
+  { topic:'biolinguistics', title:'7. Biolinguistics — The Biology of Language',
+    content:`<p><strong>Biolinguistics</strong> studies language as a biological phenomenon — an inborn capacity of the human species with roots in genes, brain and evolutionary history.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>The language faculty:</strong> an inborn, species-specific capacity unique to humans.</li>
+<li><strong>Universal Grammar:</strong> beneath surface differences, all languages share a deep common design present from birth.</li>
+<li><strong>Poverty of the stimulus:</strong> children master complex grammar quickly from incomplete evidence — suggesting some knowledge is innate.</li>
+<li><strong>Genetics:</strong> the <em>FOXP2</em> gene, when mutated, disrupts speech and grammar — a clue to the biological basis of language.</li>
+<li><strong>Evolution:</strong> how and why language emerged in our species; fascinating but hard to study since speech leaves no fossils.</li>
+</ul>
+<div class="example"><strong>Example:</strong> The KE family — members with a mutated FOXP2 gene have severe difficulties with speech and grammar, showing language has a genetic component.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Noam Chomsky</strong> — language as a biological organ</li><li><strong>Eric Lenneberg</strong> — biological foundations</li><li><strong>Lyle Jenkins</strong> & <strong>Cedric Boeckx</strong> — shaped biolinguistics as a field</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Biological Foundations of Language</em> — Lenneberg (1967)</li><li><em>Biolinguistics</em> — Lyle Jenkins (2000)</li><li><em>Language and Mind</em> — Chomsky</li></ul>`},
+
+  { topic:'developmental', title:'8. Developmental Linguistics — Child Language Acquisition',
+    content:`<p><strong>Developmental linguistics</strong> studies how children acquire their native language — the journey from a wordless newborn to a fluent five-year-old.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Stages:</strong> crying/cooing → babbling (~6 months) → first words (~12 months, holophrastic stage) → two-word stage (~18–24 months) → longer rule-governed sentences.</li>
+<li><strong>Overgeneralisation:</strong> errors like "goed," "foots," "mouses" show children have internalised rules and over-apply them — proof of active rule-building, not imitation.</li>
+<li><strong>Critical/sensitive period:</strong> language is acquired most easily in early childhood.</li>
+<li><strong>Nativism vs. behaviourism vs. usage-based:</strong> is language innate (Chomsky), learned by reinforcement (Skinner), or built from social interaction (Tomasello)?</li>
+<li><strong>Universality:</strong> children worldwide pass through similar stages on similar timetables.</li>
+</ul>
+<div class="key-point"><strong>Key Point:</strong> Overgeneralisation errors (like "goed") are actually evidence of learning — the child has figured out a rule and is applying it everywhere.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Roger Brown</strong> — landmark child speech studies</li><li><strong>Noam Chomsky</strong> — Language Acquisition Device</li><li><strong>B. F. Skinner</strong> — behaviourist account</li><li><strong>Michael Tomasello</strong> — usage-based learning</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>A First Language</em> — Roger Brown (1973)</li><li><em>First Language Acquisition</em> — Eve Clark</li><li><em>Constructing a Language</em> — Tomasello (2003)</li></ul>`},
+
+  { topic:'historical', title:'9. Historical Linguistics — Language Change Over Time',
+    content:`<p><strong>Historical linguistics</strong> studies how languages change over time in sounds, grammar, vocabulary and meaning, and how present-day languages descend from earlier ones. This is the <strong>diachronic</strong> study of language.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Sound change:</strong> pronunciation shifts systematically — the Great Vowel Shift reshaped English's long vowels between ~1400 and 1700.</li>
+<li><strong>Language families:</strong> related languages descend from one ancestor; English, Hindi, Persian, Greek and Latin all belong to the <strong>Indo-European</strong> family.</li>
+<li><strong>The comparative method:</strong> comparing related languages to reconstruct unrecorded parents like Proto-Indo-European.</li>
+<li><strong>Grimm's Law:</strong> regular consonant changes in Germanic languages (p→f, t→th, k→h) — hence Latin <em>pater</em> beside English <em>father</em>.</li>
+<li><strong>Semantic change & etymology:</strong> meanings drift — <em>nice</em> once meant "ignorant."</li>
+</ul>
+<div class="example"><strong>Example:</strong> Grimm's Law: Latin <em>pater</em> → English <em>father</em> (p→f), Latin <em>tres</em> → English <em>three</em> (t→th) — systematic, not random.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Sir William Jones</strong> — proposed the Indo-European family (1786)</li><li><strong>Jacob Grimm</strong> — Grimm's Law</li><li><strong>Karl Verner</strong> & the <strong>Neogrammarians</strong></li><li><strong>August Schleicher</strong> — family-tree model</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Historical Linguistics: An Introduction</em> — Lyle Campbell</li><li><em>Principles of Historical Linguistics</em> — Hans Henrich Hock</li></ul>`},
+
+  { topic:'stylistics', title:'10. Stylistics — The Linguistic Study of Style',
+    content:`<p><strong>Stylistics</strong> studies "style" in language using precise linguistic tools. It bridges linguistics and literary criticism, showing exactly which linguistic choices create a text's effect.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Foregrounding:</strong> making certain language "stand out" so the reader notices it.</li>
+<li><strong>Deviation:</strong> deliberately breaking linguistic norms — e.e. cummings's unconventional grammar and spacing.</li>
+<li><strong>Parallelism:</strong> repeating patterns of sound, structure or meaning — "I came, I saw, I conquered."</li>
+<li><strong>Sound patterning:</strong> alliteration, rhyme, rhythm and metre carry meaning and mood.</li>
+<li><strong>Register & genre:</strong> word-choice and structure mark a text as legal, religious, journalistic, etc.</li>
+<li><strong>Point of view & speech presentation:</strong> how narratives report characters' thought and speech.</li>
+</ul>
+<div class="example"><strong>Example:</strong> "I came, I saw, I conquered" — parallelism (same structure repeated three times) creates rhythm and emphasis, making the statement powerful and memorable.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Roman Jakobson</strong> — the poetic function of language</li><li><strong>Geoffrey Leech</strong> & <strong>Mick Short</strong> — foundational stylistics</li><li><strong>Paul Simpson</strong> — modern textbooks</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Style in Fiction</em> — Leech & Short (1981)</li><li><em>A Linguistic Guide to English Poetry</em> — Leech (1969)</li><li><em>Stylistics: A Resource Book</em> — Paul Simpson</li></ul>`},
+
+  { topic:'ethnolinguistics', title:'11. Ethnolinguistics — Language and Ethnic Worldview',
+    content:`<p><strong>Ethnolinguistics</strong> studies the relationship between a language and the culture, worldview and cognition of the ethnic group that speaks it. It focuses on how categories and beliefs are encoded in — and possibly shaped by — language.</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Cultural vocabulary:</strong> rich word-sets reveal a community's priorities — elaborate kinship terms, many words for rice, cattle, or snow.</li>
+<li><strong>Colour terms:</strong> languages divide the colour spectrum differently; yet Berlin & Kay found basic colour terms appear in a regular order across languages.</li>
+<li><strong>Kinship & classification (ethnosemantics):</strong> how different cultures carve up family relationships and the natural world.</li>
+<li><strong>Linguistic relativity:</strong> habitual patterns of one's language influence habitual thought.</li>
+<li><strong>Worldview in grammar:</strong> evidentiality (grammatically marking how you know something) reflects cultural values.</li>
+</ul>
+<div class="example"><strong>Example:</strong> Berlin & Kay found that languages add basic colour terms in a predictable order: black/white → red → green/yellow → blue → brown → purple/pink/orange/grey.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Franz Boas, Edward Sapir, B. L. Whorf</strong> — language-and-culture tradition</li><li><strong>Brent Berlin</strong> & <strong>Paul Kay</strong> — colour terms</li><li><strong>Anna Wierzbicka</strong> — cultural semantics and "cultural scripts"</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Basic Color Terms</em> — Berlin & Kay (1969)</li><li><em>Language, Thought, and Reality</em> — Whorf (1956)</li><li><em>Semantics, Culture, and Cognition</em> — Wierzbicka</li></ul>`},
+
+  { topic:'philosophy', title:'12. Philosophy of Language — The Nature of Meaning',
+    content:`<p><strong>Philosophy of language</strong> examines the deepest questions about language: What is meaning? How do words refer to things? What is the relationship between language, thought, truth and reality?</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Sense & reference (Frege):</strong> a word has a referent (the thing it points to) and a sense (the way it presents that thing) — "the morning star" and "the evening star" refer to the same planet (Venus) but differ in sense.</li>
+<li><strong>Meaning as use (Wittgenstein):</strong> a word's meaning is its use in practical "language games," not a fixed object in the mind.</li>
+<li><strong>Speech acts (Austin, Searle):</strong> utterances perform actions — promising, ordering, naming, marrying ("I now pronounce you…"). Saying can be doing.</li>
+<li><strong>Implicature (Grice):</strong> speakers convey more than they literally say, guided by the "cooperative principle" and conversational maxims.</li>
+<li><strong>Truth conditions:</strong> relating a sentence's meaning to the conditions under which it would be true.</li>
+</ul>
+<div class="key-point"><strong>Key Point:</strong> Austin's speech act theory showed that language doesn't just describe reality — it can change it. "I promise," "I apologise," and "You're fired" are all actions performed through words.</div>
+<h4>Famous Linguists</h4>
+<ul><li><strong>Gottlob Frege</strong> — sense and reference</li><li><strong>Ludwig Wittgenstein</strong> — meaning-as-use</li><li><strong>J. L. Austin</strong> & <strong>John Searle</strong> — speech act theory</li><li><strong>H. P. Grice</strong> — conversational implicature</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Philosophical Investigations</em> — Wittgenstein (1953)</li><li><em>How to Do Things with Words</em> — Austin (1962)</li><li><em>Speech Acts</em> — Searle (1969)</li></ul>`},
+
+  { topic:'computational', title:'13. Computational Linguistics — Language and Computers',
+    content:`<p><strong>Computational linguistics</strong> (CL) studies language using computational methods and models. It sits at the intersection of linguistics, computer science and artificial intelligence, asking: can we build systems that understand, produce and learn human language?</p>
+<h4>Key Ideas</h4>
+<ul>
+<li><strong>Natural Language Processing (NLP):</strong> the engineering side — building systems that process human language. Applications include machine translation (Google Translate), speech recognition (Siri, Alexa), chatbots, spell-checkers, auto-complete and sentiment analysis.</li>
+<li><strong>Corpus linguistics:</strong> using large, searchable collections of real text (corpora) to study how language is actually used — word frequency, collocations ("strong tea" not "powerful tea"), and patterns of grammar.</li>
+<li><strong>Statistical & probabilistic models:</strong> predicting what word comes next, resolving ambiguity, and modelling language patterns using probability — the foundation of modern spell-checkers, predictive text and search engines.</li>
+<li><strong>Machine translation:</strong> from early rule-based systems (Georgetown–IBM experiment, 1954) to modern neural machine translation — the long quest to make computers translate between languages.</li>
+<li><strong>Parsing & formal grammars:</strong> writing precise rules that a computer can follow to analyse sentence structure — connecting Chomsky's formal grammars to computer science.</li>
+<li><strong>Speech technology:</strong> converting speech to text (ASR — Automatic Speech Recognition) and text to speech (TTS) — the technology behind voice assistants.</li>
+<li><strong>Large Language Models (LLMs):</strong> recent AI systems (like GPT, BERT) trained on massive text data that can generate, summarise and translate text with remarkable fluency — raising deep questions about what "understanding" language means.</li>
+</ul>
+<div class="example"><strong>Example:</strong> When you type a message on your phone and it suggests the next word, that is computational linguistics at work — a statistical language model predicting the most likely continuation based on patterns learned from billions of words.</div>
+<h4>Key Concepts</h4>
+<ul>
+<li><strong>Tokenisation:</strong> breaking text into words or sub-word units — the first step in any NLP pipeline.</li>
+<li><strong>Part-of-speech tagging:</strong> automatically labelling each word as noun, verb, adjective, etc.</li>
+<li><strong>Named Entity Recognition (NER):</strong> identifying names of people, places and organisations in text.</li>
+<li><strong>Word embeddings:</strong> representing words as vectors (numbers) so that similar words are "close" in mathematical space — "king" minus "man" plus "woman" ≈ "queen."</li>
+<li><strong>The Turing Test (1950):</strong> Alan Turing's proposal that a machine "thinks" if a human cannot distinguish its responses from a human's — still debated today.</li>
+</ul>
+<div class="key-point"><strong>Key Point:</strong> Computational linguistics is both theoretical (using computers to test linguistic theories) and applied (building real-world language technologies). Chomsky's formal grammars directly inspired the parsing algorithms used in programming languages and NLP.</div>
+<h4>Famous Figures</h4>
+<ul><li><strong>Alan Turing</strong> — the Turing Test; foundations of computation</li><li><strong>Noam Chomsky</strong> — formal grammars (Chomsky hierarchy) used in both linguistics and computer science</li><li><strong>Karen Spärck Jones</strong> — pioneered information retrieval and search (TF-IDF)</li><li><strong>Christopher Manning</strong> — statistical NLP; co-author of foundational textbooks</li><li><strong>Jurafsky & Martin</strong> — authors of the standard CL textbook</li></ul>
+<h4>Key Books</h4>
+<ul><li><em>Speech and Language Processing</em> — Dan Jurafsky & James H. Martin (the "bible" of CL)</li><li><em>Foundations of Statistical Natural Language Processing</em> — Manning & Schütze (1999)</li><li><em>Natural Language Understanding</em> — James Allen</li></ul>`},
+
+  { topic:'overview', title:'📋 Summary Chart — All 13 Branches',
+    content:`<table class="summary-table">
+<tr><th>Branch</th><th>Language in relation to…</th><th>Key Figure</th><th>Key Book</th></tr>
+<tr><td>Sociolinguistics</td><td>Society</td><td>William Labov</td><td><em>Sociolinguistic Patterns</em></td></tr>
+<tr><td>Anthropological Ling.</td><td>Culture & fieldwork</td><td>Franz Boas</td><td><em>Handbook of Amer. Indian Languages</em></td></tr>
+<tr><td>Graphemics</td><td>Writing systems</td><td>I. J. Gelb</td><td><em>A Study of Writing</em></td></tr>
+<tr><td>Neurolinguistics</td><td>The brain</td><td>Eric Lenneberg</td><td><em>Biological Foundations of Language</em></td></tr>
+<tr><td>Psycholinguistics</td><td>The mind</td><td>Steven Pinker</td><td><em>The Language Instinct</em></td></tr>
+<tr><td>Cognitive Ling.</td><td>General cognition</td><td>George Lakoff</td><td><em>Metaphors We Live By</em></td></tr>
+<tr><td>Biolinguistics</td><td>Biology & evolution</td><td>Noam Chomsky</td><td><em>Language and Mind</em></td></tr>
+<tr><td>Developmental Ling.</td><td>Child acquisition</td><td>Roger Brown</td><td><em>A First Language</em></td></tr>
+<tr><td>Historical Ling.</td><td>Time / change</td><td>Jacob Grimm</td><td><em>Grimm's Law</em></td></tr>
+<tr><td>Stylistics</td><td>Literature & style</td><td>Geoffrey Leech</td><td><em>Style in Fiction</em></td></tr>
+<tr><td>Ethnolinguistics</td><td>Ethnic worldview</td><td>Berlin & Kay</td><td><em>Basic Color Terms</em></td></tr>
+<tr><td>Philosophy of Lang.</td><td>Meaning & truth</td><td>Wittgenstein</td><td><em>Philosophical Investigations</em></td></tr>
+<tr><td>Computational Ling.</td><td>Computers & AI</td><td>Jurafsky & Martin</td><td><em>Speech and Language Processing</em></td></tr>
+</table>
+<div class="key-point" style="margin-top:12px;"><strong>Remember:</strong> <strong>Microlinguistics</strong> studies language from the inside (phonetics, phonology, morphology, syntax, semantics). <strong>Macrolinguistics</strong> studies language in connection with the wider human world — mind, body, society, culture, history and thought.</div>`}
+];
+
+// ===== SET 1 — MCQ DATA (25 questions × 1 mark) =====
+const mcqData = [
+  { topic:'sociolinguistics', q:'Who conducted the famous New York department-store study on /r/ pronunciation?',
+    options:['Dell Hymes','William Labov','Peter Trudgill','Basil Bernstein'], correct:1,
+    explain:'William Labov studied how /r/ pronunciation in "fourth floor" varied by social class across different department stores in New York City.' },
+  { topic:'sociolinguistics', q:'What is "code-switching"?',
+    options:['Translating a document from one language to another','Moving between languages or varieties within a single conversation','Using formal language in all situations','A type of language disorder'], correct:1,
+    explain:'Code-switching is the practice of alternating between two or more languages or language varieties within a conversation — very common in multilingual communities.' },
+  { topic:'anthropological', q:'Who insisted that each language must be described in its own terms, not forced into European grammar categories?',
+    options:['Edward Sapir','Benjamin Lee Whorf','Franz Boas','Bronisław Malinowski'], correct:2,
+    explain:'Franz Boas, the founder of American anthropological linguistics, insisted on describing each language on its own terms rather than through the lens of European grammar.' },
+  { topic:'anthropological', q:'The Sapir–Whorf hypothesis is also known as:',
+    options:['Universal Grammar','Linguistic relativity','Communicative competence','The comparative method'], correct:1,
+    explain:'The Sapir–Whorf hypothesis, or linguistic relativity, proposes that the structure of one\'s language influences habitual thought and perception.' },
+  { topic:'graphemics', q:'What is the written counterpart of a phoneme called?',
+    options:['Allograph','Morpheme','Grapheme','Syllabary'], correct:2,
+    explain:'A grapheme is the smallest distinctive unit of a writing system — just as a phoneme is the smallest distinctive unit of a sound system.' },
+  { topic:'graphemics', q:'Malayalam script is an example of which type of writing system?',
+    options:['Logographic','Alphabetic','Abugida (syllabic)','Pictographic'], correct:2,
+    explain:'Malayalam uses an abugida (also called syllabic) system where each symbol represents a consonant-plus-vowel unit, with vowels shown as diacritical modifications.' },
+  { topic:'neurolinguistics', q:'Damage to Broca\'s area typically results in:',
+    options:['Fluent but meaningless speech','Slow, effortful, telegraphic speech with relatively preserved comprehension','Complete inability to hear','Loss of reading ability only'], correct:1,
+    explain:'Broca\'s (non-fluent) aphasia produces slow, effortful, grammatically simplified speech, but the patient can usually understand what others say.' },
+  { topic:'neurolinguistics', q:'In most right-handed people, language is primarily processed in which hemisphere?',
+    options:['Right hemisphere','Both equally','Left hemisphere','The cerebellum'], correct:2,
+    explain:'Language is lateralised to the left hemisphere in most people, especially right-handed individuals. Broca\'s and Wernicke\'s areas are both in the left hemisphere.' },
+  { topic:'psycholinguistics', q:'Jean Berko Gleason\'s "wug test" demonstrated that children:',
+    options:['Simply imitate adult speech','Apply internalised morphological rules to novel words','Cannot learn irregular forms','Are born knowing all words'], correct:1,
+    explain:'When children say "two wugs" for a creature they\'ve never seen before, they prove they have internalised the plural rule (-s) and can apply it productively, not just imitate.' },
+  { topic:'psycholinguistics', q:'A "slip of the tongue" such as saying "the queer old dean" instead of "the dear old queen" reveals:',
+    options:['A language disorder','Hidden stages of speech planning and production','Poor vocabulary','Lack of education'], correct:1,
+    explain:'Slips of the tongue (spoonerisms) reveal that speech production involves multiple stages of planning — sounds are selected and ordered before articulation, and errors show the process.' },
+  { topic:'cognitive', q:'"TIME IS MONEY" (we spend, save, waste time) is an example of:',
+    options:['A speech act','A prototype','A conceptual metaphor','A language universal'], correct:2,
+    explain:'Conceptual metaphor theory (Lakoff & Johnson) shows we systematically understand abstract concepts (time) in terms of concrete ones (money), structuring our thought and language.' },
+  { topic:'cognitive', q:'According to Eleanor Rosch\'s prototype theory, which is a more "prototypical" bird?',
+    options:['A penguin','An ostrich','A sparrow','A bat'], correct:2,
+    explain:'Prototype theory says categories have central ("best") and marginal members. A sparrow is a more prototypical bird than a penguin or ostrich because it matches our mental image of "bird" better.' },
+  { topic:'biolinguistics', q:'The FOXP2 gene is significant in biolinguistics because:',
+    options:['It controls the vocal cords directly','When mutated, it disrupts speech and grammar abilities','It is found only in bilingual individuals','It determines which language a child will speak'], correct:1,
+    explain:'The FOXP2 gene, when mutated (as in the KE family), causes severe difficulties with speech and grammar — providing evidence for a genetic/biological basis of the language faculty.' },
+  { topic:'biolinguistics', q:'The "poverty of the stimulus" argument suggests that:',
+    options:['Children get too much language input','Children master grammar too quickly from incomplete evidence for it to be purely learned','Language is entirely learned from the environment','Children cannot learn language without formal instruction'], correct:1,
+    explain:'The poverty of the stimulus argument (Chomsky) says that the language input children receive is too incomplete and messy for them to learn grammar from it alone — some knowledge must be innate.' },
+  { topic:'developmental', q:'At approximately what age do children typically begin babbling?',
+    options:['1 month','6 months','18 months','3 years'], correct:1,
+    explain:'Babbling (producing repetitive consonant-vowel sequences like "bababa") typically begins around 6 months of age, following the cooing stage.' },
+  { topic:'developmental', q:'When a child says "goed" instead of "went," this is an example of:',
+    options:['Imitation of adult speech','A language disorder','Overgeneralisation of a grammatical rule','Code-switching'], correct:2,
+    explain:'Overgeneralisation occurs when children apply a regular rule (add -ed for past tense) to irregular forms. "Goed" shows the child has learned the rule and is applying it — a sign of progress, not error.' },
+  { topic:'historical', q:'Grimm\'s Law describes:',
+    options:['How children acquire fairy tales','Regular consonant changes separating Germanic from other Indo-European languages','The rules of German spelling','How dialects become standard languages'], correct:1,
+    explain:'Grimm\'s Law is a set of regular consonant shifts (p→f, t→th, k→h) that distinguish Germanic languages from their Indo-European relatives — e.g., Latin pater → English father.' },
+  { topic:'historical', q:'English, Hindi, Persian, Greek and Latin all belong to the _____ language family.',
+    options:['Afro-Asiatic','Sino-Tibetan','Indo-European','Austronesian'], correct:2,
+    explain:'The Indo-European family is one of the world\'s largest, including most European languages plus Hindi, Persian, Bengali and many others — all descended from Proto-Indo-European.' },
+  { topic:'stylistics', q:'In stylistics, "foregrounding" means:',
+    options:['Using only standard language','Making certain language stand out against ordinary usage','Writing in the foreground of a painting','Using only formal register'], correct:1,
+    explain:'Foregrounding is a key concept in stylistics — it refers to linguistic features that "stand out" from the norm, drawing the reader\'s special attention to them for artistic effect.' },
+  { topic:'stylistics', q:'"I came, I saw, I conquered" is an example of:',
+    options:['Deviation','Parallelism','Code-switching','Overgeneralisation'], correct:1,
+    explain:'Parallelism is the repetition of a similar structural pattern — here, three short clauses with identical structure (subject + past-tense verb) create rhythm and rhetorical power.' },
+  { topic:'ethnolinguistics', q:'Berlin and Kay\'s research on colour terms showed that:',
+    options:['All languages have exactly 11 colour terms','Colour terms are completely random across languages','Basic colour terms appear in a predictable order across languages','Colour terms have no relation to culture'], correct:2,
+    explain:'Berlin & Kay found that languages add basic colour terms in a near-universal order: black/white → red → green/yellow → blue → brown → purple/pink/orange/grey.' },
+  { topic:'ethnolinguistics', q:'Ethnosemantics primarily studies:',
+    options:['The sounds of ethnic music','How different cultures classify and categorise the world through their vocabulary','The grammar of ancient languages','Brain imaging of bilingual speakers'], correct:1,
+    explain:'Ethnosemantics studies how different cultures carve up domains like kinship, plants, colours and animals through their vocabulary — revealing culturally specific ways of categorising reality.' },
+  { topic:'philosophy', q:'According to J. L. Austin\'s speech act theory, "I promise to be there" is:',
+    options:['A mere description of a mental state','A performative utterance — saying it IS doing it','A grammatical error','An example of linguistic relativity'], correct:1,
+    explain:'Austin showed that some utterances are "performative" — saying "I promise" doesn\'t describe a promise, it performs one. Language can be action, not just description.' },
+  { topic:'philosophy', q:'Frege\'s distinction between "sense" and "reference" means:',
+    options:['Words either have meaning or they don\'t','A word has both a referent (the thing it points to) and a sense (the way it presents that thing)','Meaning is entirely determined by context','Grammar determines meaning completely'], correct:1,
+    explain:'"The morning star" and "the evening star" both refer to Venus (same reference) but present it differently (different sense). Frege showed meaning involves both dimensions.' },
+  { topic:'philosophy', q:'Grice\'s "cooperative principle" explains how:',
+    options:['Children cooperate to learn language','Speakers convey more than they literally say through conversational maxims','Languages cooperate to form language families','Bilingual speakers cooperate between their two languages'], correct:1,
+    explain:'Grice argued that speakers follow unspoken maxims (quality, quantity, relevance, manner) and listeners use these expectations to infer meanings beyond the literal words — this is "implicature."' }
+];
+
+// ===== SET 2 — SHORT & LONG ANSWER (10×2 marks + 6×5 marks = 50 marks) =====
+const saData = [
+  // SHORT ANSWER (2 marks each) — questions 1-10
+  { topic:'sociolinguistics', marks:2, q:'Define "code-switching" and give one real-life example.',
+    hint:'Think about multilingual situations you see every day.',
+    model:'Code-switching is the practice of alternating between two or more languages or language varieties within a single conversation or even a single sentence. For example, in Kerala, a Malayalam speaker might say "Njan oru meeting-il attend cheyyaan pokunnu" — mixing Malayalam and English naturally. This is not a sign of incompetence but a skilful communicative strategy common in bilingual communities.' },
+  { topic:'neurolinguistics', marks:2, q:'What is the key difference between Broca\'s aphasia and Wernicke\'s aphasia?',
+    hint:'Focus on where the damage is and what language ability is affected.',
+    model:'Broca\'s aphasia (caused by damage to Broca\'s area in the left frontal lobe) results in non-fluent, effortful, telegraphic speech, but comprehension is relatively preserved — the patient knows what they want to say but struggles to say it. Wernicke\'s aphasia (caused by damage to Wernicke\'s area in the left temporal lobe) results in fluent but often meaningless speech, with severely impaired comprehension — the patient speaks easily but makes little sense and cannot understand others well.' },
+  { topic:'graphemics', marks:2, q:'What is a "grapheme"? How does it relate to a "phoneme"?',
+    hint:'Think about smallest units — one in writing, one in sound.',
+    model:'A grapheme is the smallest distinctive unit in a writing system — it is the written counterpart of a phoneme, which is the smallest distinctive unit in a sound system. For instance, the English word "cat" has three phonemes (/k/, /æ/, /t/) and three graphemes (⟨c⟩, ⟨a⟩, ⟨t⟩). Just as phonemes distinguish spoken words, graphemes distinguish written words.' },
+  { topic:'psycholinguistics', marks:2, q:'What does the "wug test" prove about how children learn language?',
+    hint:'What happens when a child is shown a creature called a "wug" and asked about two of them?',
+    model:'In the wug test (Jean Berko Gleason, 1958), children are shown a picture of a made-up creature called a "wug" and told "Now there are two of them. There are two ___." Children spontaneously say "wugs," applying the English plural rule to a word they have never heard before. This proves children do not merely imitate adult speech — they internalise productive grammatical rules and can apply them to novel items.' },
+  { topic:'cognitive', marks:2, q:'Give two examples of conceptual metaphors in everyday English.',
+    hint:'Think about how we talk about abstract things using concrete/physical terms.',
+    model:'(1) TIME IS MONEY — we "spend" time, "save" time, "waste" time, and say "time is running out," treating the abstract concept of time as if it were a valuable commodity. (2) ARGUMENT IS WAR — we "defend" our position, "attack" someone\'s argument, "shoot down" ideas, and try to "win" the debate, treating intellectual disagreement as physical combat. These conceptual metaphors (Lakoff & Johnson) show that our abstract thinking is systematically structured by concrete, bodily experience.' },
+  { topic:'developmental', marks:2, q:'What is "overgeneralisation" in child language acquisition? Give an example.',
+    hint:'What kind of "errors" do children make that actually show they\'re learning rules?',
+    model:'Overgeneralisation occurs when a child applies a regular grammatical rule to an irregular form. For example, a child might say "goed" instead of "went" (overgeneralising the past-tense rule: add -ed) or "foots" instead of "feet" (overgeneralising the plural rule: add -s). These "errors" are actually evidence of learning — the child has figured out the rule and is applying it productively, showing active rule-building rather than mere imitation of adult speech.' },
+  { topic:'historical', marks:2, q:'What is Grimm\'s Law? Give one example of a consonant shift it describes.',
+    hint:'Think about systematic sound changes between Germanic and other Indo-European languages.',
+    model:'Grimm\'s Law describes a set of regular consonant changes that distinguish the Germanic languages from other Indo-European languages. The shifts include: p→f, t→th, k→h. For example, Latin "pater" corresponds to English "father" (p→f), and Latin "tres" corresponds to English "three" (t→th). These changes are systematic and predictable, showing that language change follows regular patterns, not random variation.' },
+  { topic:'biolinguistics', marks:2, q:'What is the "poverty of the stimulus" argument?',
+    hint:'Think about the gap between the language input children receive and what they manage to learn.',
+    model:'The poverty of the stimulus argument (Chomsky) states that the language input children receive is too incomplete, messy and unsystematic for them to learn grammar entirely from it. Yet children master complex grammatical rules quickly and reliably. This gap between the impoverished input and the rich output (grammatical competence) suggests that some linguistic knowledge must be innate — part of a biological endowment (Universal Grammar) rather than something learned entirely from experience.' },
+  { topic:'stylistics', marks:2, q:'Explain the difference between "deviation" and "parallelism" in stylistics.',
+    hint:'One breaks the norm; the other repeats a pattern.',
+    model:'Deviation is the deliberate breaking of linguistic norms for artistic effect — departing from expected rules of grammar, spelling, punctuation or meaning to draw attention. Example: e.e. cummings writing entirely in lowercase. Parallelism is the deliberate repetition of a similar structural pattern to create rhythm, emphasis or balance. Example: "I came, I saw, I conquered" repeats the same Subject+Verb structure three times. Both are forms of foregrounding that make language "stand out."' },
+  { topic:'philosophy', marks:2, q:'What does J. L. Austin mean by a "performative utterance"?',
+    hint:'Some sentences don\'t just say things — they DO things.',
+    model:'A performative utterance is a sentence that doesn\'t just describe or report something — it actually performs an action. When a judge says "I sentence you to five years," the saying IS the sentencing. When someone says "I promise to be there," the utterance itself creates the promise. Austin distinguished these from "constative" utterances (which describe facts and can be true or false). Performatives are neither true nor false — they are "felicitous" (successful) or "infelicitous" (unsuccessful) depending on whether the right conditions are met.' },
+
+  // LONG ANSWER (5 marks each) — questions 11-16
+  { topic:'sociolinguistics', marks:5, q:'Discuss how language variation is connected to social factors such as class, region, gender and formality. Use at least two examples from the study material.',
+    hint:'Think about Labov\'s studies, registers, dialects, and how language reflects social identity.',
+    model:'Language variation — systematic differences in sound, vocabulary and grammar across speakers and situations — is a central concern of sociolinguistics. Variation patterns with several social factors:\n\n(1) Social class: Labov\'s New York department-store study showed that /r/ pronunciation ("fourth floor") increased with social class — speakers in higher-end stores (Saks) used more /r/ than those in lower-end stores (S. Klein). This shows phonological variation correlating with socioeconomic status.\n\n(2) Region/dialect: Every speaker speaks a dialect — a regional variety with distinctive features. There is no "accent-less" English. British English, American English and Indian English differ systematically in pronunciation, vocabulary and even grammar.\n\n(3) Register and formality: The same speaker adjusts their language to the situation — using formal vocabulary, complex grammar and careful pronunciation in a job interview, but casual forms, slang and rapid speech with friends. This is called style-shifting.\n\n(4) Gender: Research by Deborah Tannen and Janet Holmes has shown gender-linked patterns — e.g., women tend to use more standard forms in formal contexts and more hedging/politeness strategies.\n\n(5) Prestige: Standard varieties carry "overt" prestige (publicly valued), while non-standard forms can carry "covert" prestige as markers of group solidarity and local identity.\n\nThe key insight is that variation is not random or "bad" speech — it is normal, rule-governed and socially meaningful.' },
+  { topic:'neurolinguistics', marks:5, q:'Explain how brain injuries (aphasia) have helped scientists understand how language is organised in the brain. Discuss both Broca\'s and Wernicke\'s contributions.',
+    hint:'Cover the location of each area, what happens when it is damaged, and what this tells us about how the brain processes language.',
+    model:'The study of aphasia — language loss due to brain damage — has been one of the most important sources of evidence about how language is organised in the brain.\n\n(1) Broca\'s contribution (1861): Paul Broca studied a patient ("Tan") who could understand speech but could only produce one syllable. Post-mortem examination revealed damage to the left frontal lobe. This region, now called Broca\'s area, is associated with speech production and grammatical processing. Damage causes Broca\'s (non-fluent) aphasia: slow, effortful, telegraphic speech ("Want… book… read") with relatively preserved comprehension. The patient knows what they want to say but cannot assemble the words fluently.\n\n(2) Wernicke\'s contribution (1874): Carl Wernicke identified a different region in the left temporal lobe. Damage here causes Wernicke\'s (fluent) aphasia: speech flows easily and sounds grammatical, but is often meaningless or filled with incorrect words ("I went to the thing and the stuff was gribble"). Comprehension is severely impaired.\n\n(3) What this tells us: The double dissociation between Broca\'s and Wernicke\'s aphasia reveals that language is not a single, unified process in the brain. Production and comprehension are handled by different regions. Grammar/production is more frontal (Broca\'s); meaning/comprehension is more temporal (Wernicke\'s). This shows the brain treats phonology, syntax and semantics as partly separate systems.\n\n(4) Modern advances: Brain imaging (fMRI, EEG) now confirms and refines these findings by showing language processing in healthy brains in real time. Lateralisation — the dominance of the left hemisphere for language — is well established, though the right hemisphere also contributes (e.g., to prosody and pragmatics).' },
+  { topic:'cognitive', marks:5, q:'Explain the main ideas of Cognitive Linguistics — conceptual metaphor, embodiment and prototype theory — with examples for each.',
+    hint:'Cover Lakoff & Johnson on metaphor, the idea that meaning is grounded in physical experience, and Rosch\'s work on categories.',
+    model:'Cognitive Linguistics (CL) is a school that treats language as inseparable from general human cognition. Unlike Chomskyan linguistics, CL does not view language as a separate "module" in the mind. Its key ideas:\n\n(1) Conceptual metaphor (Lakoff & Johnson, 1980): We systematically understand abstract concepts through concrete, physical ones. Examples: TIME IS MONEY — we "spend," "save," "waste" and "invest" time; ARGUMENT IS WAR — we "attack," "defend," "shoot down" and "win" arguments; LIFE IS A JOURNEY — we talk about "crossroads," "being lost," and "moving forward." These are not merely poetic — they structure our everyday thinking and language.\n\n(2) Embodiment: Meaning is grounded in bodily experience. Our physical interactions with the world shape how we think and talk. Examples: "feeling UP/DOWN" for happy/sad emotions reflects our bodily posture; a "warm person" maps physical temperature to emotional quality; "grasping an idea" maps physical holding to mental understanding. The body is the foundation of meaning, not an abstract logical system.\n\n(3) Prototype theory (Eleanor Rosch): Categories do not have strict, all-or-nothing boundaries. Instead, they have central ("prototypical") and marginal members. A sparrow is a more prototypical "bird" than a penguin, ostrich or kiwi. Categories have fuzzy edges — a tomato can be categorised as fruit or vegetable depending on context. This challenges the classical (Aristotelian) view that categories are defined by necessary and sufficient conditions.\n\n(4) Additional ideas: Frame semantics (Fillmore) — a word evokes an entire background scene; "buy" activates buyer, seller, goods, money. Construction grammar — grammatical patterns are form-meaning pairs learned as wholes.\n\nOverall, CL places meaning at the centre and argues that grammar itself is meaningful, shaped by perception, bodily experience and general cognitive processes.' },
+  { topic:'historical', marks:5, q:'Discuss how languages change over time, covering sound change, the comparative method, language families and semantic change. Use specific examples.',
+    hint:'Cover the Great Vowel Shift, Grimm\'s Law, Indo-European, and how word meanings drift.',
+    model:'Historical linguistics studies language change across time — the diachronic view. Languages change at every level:\n\n(1) Sound change: Pronunciation shifts systematically. The Great Vowel Shift (c. 1400–1700) reshaped all of English\'s long vowels — for instance, Middle English "bite" was pronounced like modern "beet," and "house" was pronounced like "hoose." This is why English spelling often doesn\'t match pronunciation: the spelling was fixed before the sounds changed. Grimm\'s Law describes regular consonant shifts separating Germanic languages from other Indo-European languages: p→f (Latin pater → English father), t→th (Latin tres → English three), k→h (Latin cor → English heart).\n\n(2) The comparative method: By systematically comparing cognates (related words) across languages, linguists can reconstruct unrecorded ancestor languages. Comparing Latin pater, Sanskrit pitar, English father, and German Vater reveals regular correspondences pointing to a shared ancestor: Proto-Indo-European *pəter.\n\n(3) Language families: Related languages are grouped into families. The Indo-European family includes English, Hindi, Persian, Greek, Latin, Russian and hundreds more — all descended from Proto-Indo-European, spoken perhaps 5,000–6,000 years ago. August Schleicher introduced the "family tree" model to visualise these relationships.\n\n(4) Semantic change: Word meanings drift over time. "Nice" originally meant "ignorant" (from Latin nescius); "silly" once meant "blessed/innocent"; "awful" meant "full of awe" (positive). Meanings can narrow, broaden, improve (ameliorate) or worsen (pejorate).\n\n(5) Causes of change: Contact and borrowing (English borrowed thousands of words from French after 1066), ease of pronunciation, social pressures, and analogy (irregular forms being regularised).\n\nThe key insight is that language change is natural, inevitable and systematic — not decay or corruption.' },
+  { topic:'anthropological', marks:5, q:'Explain how anthropological linguistics approaches the study of language differently from formal linguistics. Discuss fieldwork, the Sapir–Whorf hypothesis and the principle of describing each language on its own terms.',
+    hint:'Focus on the method (fieldwork, documentation), the key theoretical idea (linguistic relativity), and the philosophical stance (no language is "primitive").',
+    model:'Anthropological linguistics (AL) studies language as part of human culture, approaching it very differently from formal/structural linguistics:\n\n(1) Fieldwork and documentation: AL\'s primary method is descriptive fieldwork — living with a community, recording natural speech, and producing grammars, dictionaries and text collections. This is crucial for the world\'s many under-described and endangered languages. Unlike armchair theorising, AL insists on data from real communities. Franz Boas pioneered this approach with his Handbook of American Indian Languages (1911), documenting dozens of Native American languages before they were lost.\n\n(2) Each language on its own terms: A fundamental principle of AL is that no language is "primitive" or inferior. Every language is a complete, sophisticated system. Boas rejected the practice of forcing all languages into the categories of Latin or English grammar. Instead, each language\'s grammar should be described using categories that arise from its own structure. This was revolutionary — earlier scholars had assumed European grammar was the universal model.\n\n(3) Language reflects its world: A community\'s vocabulary mirrors what matters to it. A fishing community may have dozens of words for water conditions; an agricultural community may have elaborate terms for soil, rain and crops. Kinship terminology varies dramatically — some languages have single words for relationships that English needs phrases to describe.\n\n(4) The Sapir–Whorf hypothesis (linguistic relativity): Edward Sapir and Benjamin Lee Whorf proposed that the structure of one\'s language influences habitual thought and perception. The strong version (linguistic determinism — language determines thought) is largely rejected, but the weak version (language influences habitual thought and attention) has received experimental support. For example, languages that require speakers to grammatically mark evidentiality (how they know something) may make speakers more attentive to the source of information.\n\n(5) Tied to ethnography: In AL, language study goes hand-in-hand with understanding customs, kinship, beliefs and social organisation. Language is not studied in isolation but as part of the cultural whole.\n\nAL\'s contribution is a deeply respectful, culturally grounded approach to language study that has documented hundreds of languages and shown that all human languages are equally complex and worthy of study.' },
+  { topic:'philosophy', marks:5, q:'Discuss the contributions of Frege, Wittgenstein, Austin and Grice to the philosophy of language. How did each thinker change our understanding of meaning?',
+    hint:'Cover sense vs. reference, meaning-as-use, speech acts, and conversational implicature.',
+    model:'The philosophy of language examines fundamental questions about meaning, reference and communication. Four thinkers transformed the field:\n\n(1) Gottlob Frege — Sense and Reference (1892): Frege showed that meaning has two dimensions. "Reference" (Bedeutung) is the actual thing a word points to in the world. "Sense" (Sinn) is the way it presents that thing. "The morning star" and "the evening star" both refer to the planet Venus (same reference) but present it differently (different sense). This distinction is fundamental: two expressions can have the same reference but different senses, which is why "the morning star is the evening star" is informative, while "the morning star is the morning star" is trivial.\n\n(2) Ludwig Wittgenstein — Meaning as Use (1953): In his Philosophical Investigations, Wittgenstein argued that a word\'s meaning is not a fixed mental image or definition but its use in the practical "language games" of social life. "Game" itself has no single defining feature shared by all games — board games, card games, Olympic games — yet we use the word perfectly well. Meaning emerges from how words function in actual communicative practices, not from abstract definitions.\n\n(3) J. L. Austin — Speech Act Theory (1962): In How to Do Things with Words, Austin showed that language doesn\'t merely describe the world — it can change it. "I promise," "I apologise," "I name this ship," and "You\'re fired" are performative utterances — saying them IS doing them. Austin classified speech acts into locutionary (the act of saying), illocutionary (the act performed in saying — promising, warning) and perlocutionary (the effect on the hearer — persuading, frightening). John Searle further developed the theory with felicity conditions.\n\n(4) H. P. Grice — Conversational Implicature (1975): Grice explained how speakers convey more than they literally say. He proposed the Cooperative Principle — speakers are expected to follow four maxims: Quality (be truthful), Quantity (be appropriately informative), Relevance (be relevant) and Manner (be clear). When a speaker apparently violates a maxim, the hearer infers an implied meaning (implicature). If asked "Is John a good cook?" and someone replies "He hasn\'t poisoned anyone yet," the apparent violation of the quantity maxim implies that John is not a good cook.\n\nTogether, these four thinkers moved philosophy of language from treating meaning as a simple word-to-world correspondence to understanding it as a rich, multidimensional, socially situated phenomenon.' }
+];
+
+// ===== STATE =====
+let currentSet = 0;
+let testData = [];
+let studentName = '';
+let studentRollNo = '';
+let answered = 0;
+
+// ===== LEARN =====
+function showLearn() {
+  let html = '';
+  LEARN_DATA.forEach((item, i) => {
+    const info = TOPICS[item.topic] || { icon:'📖', name:item.title };
+    html += `<div class="learn-card">
+      <div class="learn-header" id="lh-${i}" onclick="toggleLearn(${i})">
+        <span class="lh-icon">${info.icon || '📖'}</span>
+        <span class="lh-title">${item.title}</span>
+        <span class="lh-arrow">▼</span>
+      </div>
+      <div class="learn-body" id="lb-${i}">${item.content}</div>
+    </div>`;
+  });
+  document.getElementById('learnContent').innerHTML = html;
+  showScreen('learnScreen');
+}
+function toggleLearn(i) {
+  document.getElementById('lh-'+i).classList.toggle('open');
+  document.getElementById('lb-'+i).classList.toggle('open');
+}
+
+// ===== NAVIGATION =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome() { showScreen('homeScreen'); }
+
+function confirmExit() {
+  if (answered > 0) {
+    if (confirm('You have answered ' + answered + ' question(s). Your progress will be saved as incomplete. Exit?')) {
+      saveIncomplete();
+      goHome();
+    }
+  } else { goHome(); }
+}
+
+function startTest(setNum) {
+  currentSet = setNum;
+  showScreen('nameScreen');
+}
+
+function beginTest() {
+  studentRollNo = document.getElementById('studentRollNo').value.trim();
+  studentName = document.getElementById('studentName').value.trim();
+  if (!studentRollNo || !studentName) { alert('Please enter both Roll No and Name.'); return; }
+
+  const sets = {
+    1: { title:'Set 1 — Multiple Choice (Macrolinguistics)', subtitle:'25 questions × 1 mark across all 12 branches. Select the correct answer.', color:'var(--set1)', data:mcqData },
+    2: { title:'Set 2 — Short & Long Answer', subtitle:'10 short-answer (2 marks) + 6 long-answer (5 marks) = 50 marks total. Write your answer, submit, then self-rate.', color:'var(--set2)', data:saData }
+  };
+  const set = sets[currentSet];
+  testData = set.data.map(d => ({...d}));
+  answered = 0;
+
+  document.getElementById('testTitle').textContent = set.title;
+  document.getElementById('testTitle').style.color = set.color;
+  document.getElementById('testSubtitle').textContent = set.subtitle;
+  document.getElementById('testBar').style.background = set.color;
+  document.getElementById('testSubmitBtn').style.display = 'none';
+
+  if (currentSet === 1) renderMCQ();
+  else renderSA();
+
+  showScreen('testScreen');
+}
+
+// ===== MCQ RENDERER (Set 1) =====
+function renderMCQ() {
+  let html = '';
+  testData.forEach((item, qi) => {
+    const tInfo = TOPICS[item.topic] || { name:item.topic, icon:'' };
+    html += `<div class="mcq-card" id="mcq-${qi}">
+      <div class="q-num">${tInfo.icon} ${tInfo.name} · Question ${qi+1} of ${testData.length}</div>
+      <div class="q-text">${item.q}</div>
+      <div class="mcq-options" id="opts-${qi}">
+        ${item.options.map((o,oi) => `<button class="mcq-option" onclick="pickMCQ(${qi},${oi})" id="opt-${qi}-${oi}">
+          <span class="opt-icon">●</span> ${o}
+        </button>`).join('')}
+      </div>
+      <div class="mcq-feedback" id="fb-${qi}"></div>
+    </div>`;
+  });
+  document.getElementById('testContent').innerHTML = html;
+  updateProgress();
+}
+
+function pickMCQ(qi, oi) {
+  if (testData[qi]._done) return;
+  testData[qi]._done = true;
+  testData[qi]._picked = oi;
+  answered++;
+  const isCorrect = oi === testData[qi].correct;
+  testData[qi]._correct = isCorrect;
+
+  // Disable all options
+  testData[qi].options.forEach((_, i) => {
+    const btn = document.getElementById(`opt-${qi}-${i}`);
+    btn.disabled = true;
+    if (i === oi) {
+      btn.classList.add('chosen', isCorrect ? 'correct' : 'wrong');
+    }
+    if (i === testData[qi].correct && !isCorrect) {
+      btn.classList.add('reveal-correct');
+    }
+  });
+
+  // Feedback
+  const fb = document.getElementById(`fb-${qi}`);
+  fb.className = `mcq-feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  fb.innerHTML = isCorrect
+    ? `<strong>✅ Correct!</strong> ${testData[qi].explain}`
+    : `<strong>❌ Not quite.</strong> ${testData[qi].explain}`;
+
+  updateProgress();
+}
+
+// ===== SHORT & LONG ANSWER RENDERER (Set 2) =====
+function renderSA() {
+  let html = '';
+  testData.forEach((item, qi) => {
+    const tInfo = TOPICS[item.topic] || { name:item.topic, icon:'' };
+    const isLong = item.marks === 5;
+    const qNum = qi + 1;
+    const section = isLong ? 'Section B — Long Answer' : 'Section A — Short Answer';
+    html += `<div class="sa-card" id="sa-${qi}">
+      <div class="q-num">${tInfo.icon} ${tInfo.name} · ${section} · Q${qNum}</div>
+      <div class="q-marks">${item.marks} marks</div>
+      <div class="q-text">${item.q}</div>
+      ${item.hint ? `<div class="q-hint">💡 Hint: ${item.hint}</div>` : ''}
+      <textarea class="sa-textarea ${isLong ? 'long' : ''}" id="ans-${qi}" placeholder="Type your answer here…" rows="${isLong ? 8 : 4}"></textarea>
+      <button class="sa-submit-btn" id="sub-${qi}" onclick="submitSA(${qi})">Submit Answer</button>
+      <div class="sa-feedback" id="safb-${qi}">
+        <h4>✅ Model Answer</h4>
+        <div class="model-answer" id="model-${qi}"></div>
+        <div class="self-rate">
+          <p>How well did your answer match? Rate yourself honestly:</p>
+          <div class="rate-btns" id="rate-${qi}">
+            <button class="rate-btn" onclick="rateSA(${qi}, 0, this)">😟 Missed most points</button>
+            <button class="rate-btn" onclick="rateSA(${qi}, 0.4, this)">😐 Got some ideas right</button>
+            <button class="rate-btn" onclick="rateSA(${qi}, 0.7, this)">🙂 Mostly correct</button>
+            <button class="rate-btn" onclick="rateSA(${qi}, 1, this)">🎉 Nailed it!</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('testContent').innerHTML = html;
+  updateProgress();
+}
+
+function submitSA(qi) {
+  const textarea = document.getElementById(`ans-${qi}`);
+  const answer = textarea.value.trim();
+  if (!answer) { alert('Please write an answer before submitting.'); return; }
+
+  testData[qi]._done = true;
+  testData[qi]._answer = answer;
+  answered++;
+
+  textarea.disabled = true;
+  document.getElementById(`sub-${qi}`).disabled = true;
+  document.getElementById(`sub-${qi}`).textContent = '✓ Submitted';
+
+  // Show model answer
+  const modelDiv = document.getElementById(`model-${qi}`);
+  modelDiv.innerHTML = testData[qi].model.replace(/\n/g, '<br>');
+  document.getElementById(`safb-${qi}`).classList.add('show');
+
+  updateProgress();
+}
+
+function rateSA(qi, fraction, btn) {
+  if (testData[qi]._rated) return;
+  testData[qi]._rated = true;
+  testData[qi]._score = fraction * testData[qi].marks;
+
+  // Highlight selected
+  const btns = document.getElementById(`rate-${qi}`).querySelectorAll('.rate-btn');
+  btns.forEach(b => { b.disabled = true; });
+  btn.classList.add('selected');
+
+  updateProgress();
+}
+
+// ===== PROGRESS =====
+function updateProgress() {
+  const total = testData.length;
+  const pct = Math.round((answered / total) * 100);
+  document.getElementById('testProgress').textContent = `${answered}/${total}`;
+  document.getElementById('testBar').style.width = pct + '%';
+
+  // For MCQ: show submit when all answered
+  if (currentSet === 1 && answered === total) {
+    document.getElementById('testSubmitBtn').style.display = 'inline-block';
+  }
+  // For SA: show submit when all rated
+  if (currentSet === 2) {
+    const allRated = testData.every(d => d._rated || !d._done);
+    const allDone = testData.every(d => d._done);
+    if (allDone && testData.every(d => d._rated)) {
+      document.getElementById('testSubmitBtn').style.display = 'inline-block';
+    }
+  }
+}
+
+// ===== FINISH =====
+function finishTest() {
+  let score = 0, totalMarks = 0, good = 0, errors = 0, unanswered = 0;
+
+  if (currentSet === 1) {
+    totalMarks = testData.length;
+    testData.forEach(d => {
+      if (!d._done) unanswered++;
+      else if (d._correct) { score++; good++; }
+      else errors++;
+    });
+  } else {
+    testData.forEach(d => {
+      totalMarks += d.marks;
+      if (!d._done) unanswered += d.marks;
+      else if (d._rated) {
+        score += d._score;
+        if (d._score >= d.marks * 0.7) good++;
+        else errors++;
+      } else errors++;
+    });
+    score = Math.round(score * 10) / 10;
+  }
+
+  const pct = Math.round((score / totalMarks) * 100);
+  const gi = getGradeInfo(pct);
+
+  // Topic breakdown
+  const topicMap = {};
+  testData.forEach(d => {
+    if (!topicMap[d.topic]) topicMap[d.topic] = { right:0, total:0 };
+    topicMap[d.topic].total++;
+    if (currentSet === 1) {
+      if (d._correct) topicMap[d.topic].right++;
+    } else {
+      if (d._rated && d._score >= d.marks * 0.5) topicMap[d.topic].right++;
+    }
+  });
+
+  let topicHtml = '';
+  for (const tid in topicMap) {
+    const t = topicMap[tid];
+    const info = TOPICS[tid] || { name:tid, icon:'' };
+    const tpct = Math.round((t.right / t.total) * 100);
+    const cls = tpct >= 70 ? 'strong' : tpct >= 40 ? 'medium' : 'weak';
+    topicHtml += `<div class="topic-strength">
+      <span style="min-width:160px">${info.icon} ${info.name}</span>
+      <div class="bar-bg"><div class="bar-fill ${cls}" style="width:${tpct}%"></div></div>
+      <span style="min-width:40px;text-align:right;font-weight:700">${tpct}%</span>
+    </div>`;
+  }
+
+  // Weak topics for advice
+  const weakTopics = [];
+  for (const tid in topicMap) {
+    const t = topicMap[tid];
+    if (t.right / t.total < 0.5) {
+      const info = TOPICS[tid] || { name:tid };
+      weakTopics.push(info.name);
+    }
+  }
+
+  const setNames = { 1:'MCQ (Set 1)', 2:'Short & Long Answer (Set 2)' };
+
+  // Encouragement based on level
+  let encourageHtml = '';
+  if (pct >= 80) {
+    encourageHtml = `<div class="encourage-box">
+      <div class="emoji">🌟</div>
+      <h3>Outstanding, ${studentName}!</h3>
+      <p>You've demonstrated excellent knowledge of macrolinguistics! You're well-prepared. Keep reading widely — try the recommended books to deepen your understanding even further.</p>
+    </div>`;
+  } else if (pct >= 60) {
+    encourageHtml = `<div class="encourage-box">
+      <div class="emoji">💪</div>
+      <h3>Good work, ${studentName}!</h3>
+      <p>You have a solid foundation. Review the topics where you scored lower — the Learn section has everything you need. One more round of practice and you'll be at the top!</p>
+    </div>`;
+  } else if (pct >= 40) {
+    encourageHtml = `<div class="encourage-box">
+      <div class="emoji">📖</div>
+      <h3>Keep going, ${studentName}!</h3>
+      <p>You're building your understanding — every attempt makes you stronger. Go back to the Learn section, focus on the weaker topics below, and try again. Your Macro Twin believes in you!</p>
+    </div>`;
+  } else {
+    encourageHtml = `<div class="encourage-box">
+      <div class="emoji">🤗</div>
+      <h3>Don't worry, ${studentName}!</h3>
+      <p>Learning macrolinguistics takes time, and this is just the beginning. Start with the Learn section — read each topic carefully, take notes, and come back to try again. Your Macro Twin is here to help!</p>
+    </div>`;
+  }
+
+  // Next steps
+  let nextSteps = '<div class="next-step-box"><h3>📋 Your Macro Twin Recommends:</h3><ol>';
+  if (weakTopics.length > 0) {
+    nextSteps += `<li>📚 <strong>Review these topics:</strong> ${weakTopics.join(', ')}</li>`;
+  }
+  if (currentSet === 1) {
+    nextSteps += '<li>✍️ Try Set 2 (Short & Long Answer) to test your deeper understanding</li>';
+  } else {
+    nextSteps += '<li>📝 Try Set 1 (MCQ) to test your breadth of knowledge</li>';
+  }
+  nextSteps += '<li>🔄 Retake this test after reviewing — track your improvement!</li>';
+  if (pct >= 70) nextSteps += '<li>📖 Explore the recommended books listed in the Learn section</li>';
+  nextSteps += '</ol></div>';
+
+  document.getElementById('resultsContent').innerHTML = `
+    <div class="result-header">
+      <h2 style="color:var(--accent);">Test Results</h2>
+      <p style="color:var(--muted);">${studentName} · ${studentRollNo} · ${setNames[currentSet]}</p>
+      <div class="score-ring" style="border-color:${gi.color}">${pct}%</div>
+      <div class="score-pct" style="color:${gi.color}">${score} / ${totalMarks} marks</div>
+      <div class="grade-text" style="color:${gi.color}">${gi.emoji} ${gi.grade}</div>
+      <div class="grade-msg">${gi.gradeMsg}</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" style="color:var(--good)">${currentSet===1 ? good : good}</div><div class="stat-label">${currentSet===1 ? 'Correct' : 'Strong'}</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--weak)">${errors}</div><div class="stat-label">${currentSet===1 ? 'Incorrect' : 'Needs Work'}</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--muted)">${currentSet===1 ? unanswered : Math.round(unanswered)}</div><div class="stat-label">Unanswered</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${pct}%</div><div class="stat-label">Score</div></div>
+    </div>
+    <h3 style="color:var(--accent);margin:20px 0 10px;">📊 Topic-wise Strength</h3>
+    ${topicHtml}
+    ${encourageHtml}
+    ${nextSteps}
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn btn-primary" onclick="goHome()" style="margin-right:10px;">🏠 Home</button>
+      <button class="btn btn-outline" onclick="startTest(${currentSet})">🔄 Retake</button>
+    </div>
+  `;
+
+  // Save
+  const result = {
+    rollNo: studentRollNo, name: studentName,
+    set: setNames[currentSet], score: score,
+    grade: gi.grade, good: good, weak: errors,
+    unanswered: currentSet===1 ? unanswered : Math.round(unanswered),
+    total: totalMarks, status: 'Completed',
+    date: new Date().toISOString()
+  };
+  saveResult(result);
+  showScreen('resultsScreen');
+}
+
+function getGradeInfo(pct) {
+  if (pct >= 90) return { grade:'Excellent', gradeMsg:'Outstanding performance! You truly understand macrolinguistics.', emoji:'🌟', color:'var(--good)' };
+  if (pct >= 75) return { grade:'Very Good', gradeMsg:'Strong understanding — keep building on this foundation!', emoji:'💪', color:'var(--good)' };
+  if (pct >= 60) return { grade:'Good', gradeMsg:'Solid effort — review the weaker areas and you\'ll improve quickly.', emoji:'👍', color:'var(--avg)' };
+  if (pct >= 40) return { grade:'Satisfactory', gradeMsg:'You\'re getting there — focus on the Learn section for the topics you missed.', emoji:'📖', color:'var(--avg)' };
+  return { grade:'Needs Improvement', gradeMsg:"Don't worry — this is a learning journey. Your Macro Twin is here to help!", emoji:'🤗', color:'var(--weak)' };
+}
+
+// ===== SAVE =====
+function saveResult(r) {
+  try {
+    let arr = JSON.parse(localStorage.getItem('macTwinResults') || '[]');
+    arr.push(r);
+    localStorage.setItem('macTwinResults', JSON.stringify(arr));
+  } catch(e) {}
+
+  if (SHEET_URL) {
+    fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(r)
+    }).catch(() => {});
+  }
+}
+
+function saveIncomplete() {
+  const setNames = { 1:'MCQ (Set 1)', 2:'Short & Long Answer (Set 2)' };
+  let score = 0, totalMarks = 0;
+  if (currentSet === 1) {
+    totalMarks = testData.length;
+    testData.forEach(d => { if (d._correct) score++; });
+  } else {
+    testData.forEach(d => {
+      totalMarks += d.marks;
+      if (d._rated) score += d._score;
+    });
+    score = Math.round(score * 10) / 10;
+  }
+  saveResult({
+    rollNo: studentRollNo, name: studentName,
+    set: setNames[currentSet], score: score,
+    grade: 'Incomplete', good: 0, weak: 0,
+    unanswered: testData.length - answered,
+    total: totalMarks, status: 'Incomplete',
+    date: new Date().toISOString()
+  });
+}
+
+// ===== DASHBOARD =====
+function showDashLogin() {
+  showScreen('dashboardScreen');
+  document.getElementById('dashContent').innerHTML = `
+    <div class="dash-login">
+      <h3 style="color:var(--accent);margin-bottom:12px;">Teacher Login</h3>
+      <input type="text" id="dashUser" placeholder="Username">
+      <input type="password" id="dashPass" placeholder="Password">
+      <br>
+      <button class="btn btn-primary" onclick="dashLogin()">Login</button>
+      <p id="dashError" style="color:var(--weak);font-size:.85rem;margin-top:8px;display:none;"></p>
+    </div>`;
+}
+
+function dashLogin() {
+  const u = document.getElementById('dashUser').value.trim();
+  const p = document.getElementById('dashPass').value.trim();
+  if (u === 'admin' && p === 'macro2024') {
+    renderDashboard();
+  } else {
+    const err = document.getElementById('dashError');
+    err.textContent = 'Invalid username or password.';
+    err.style.display = 'block';
+  }
+}
+
+function renderDashboard() {
+  let results = [];
+  try { results = JSON.parse(localStorage.getItem('macTwinResults') || '[]'); } catch(e) {}
+
+  if (SHEET_URL) {
+    fetch(SHEET_URL).then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length) {
+        results = data;
+        buildDashboard(results);
+      } else buildDashboard(results);
+    }).catch(() => buildDashboard(results));
+  } else buildDashboard(results);
+}
+
+function buildDashboard(results) {
+  if (!results.length) {
+    document.getElementById('dashContent').innerHTML = '<p style="text-align:center;color:var(--muted);margin-top:40px;">No results yet. Students need to complete tests first.</p>';
+    return;
+  }
+
+  const completed = results.filter(r => r.status === 'Completed' || r.Status === 'Completed');
+  const totalSubs = results.length;
+  const avgScore = completed.length ? Math.round(completed.reduce((s, r) => s + (parseFloat(r.score || r.Score || 0) / parseFloat(r.total || r.Total || 1) * 100), 0) / completed.length) : 0;
+  const passRate = completed.length ? Math.round(completed.filter(r => {
+    const sc = parseFloat(r.score || r.Score || 0);
+    const tot = parseFloat(r.total || r.Total || 1);
+    return (sc / tot) >= 0.4;
+  }).length / completed.length * 100) : 0;
+
+  let html = `
+    <div class="dash-stats">
+      <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${totalSubs}</div><div class="stat-label">Total Submissions</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--good)">${avgScore}%</div><div class="stat-label">Avg Score</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--avg)">${passRate}%</div><div class="stat-label">Pass Rate (≥40%)</div></div>
+    </div>
+    <div class="dash-table-wrap"><table class="dash-table"><thead><tr>
+      <th>Roll No</th><th>Name</th><th>Set</th><th>Score</th><th>Grade</th><th>Status</th><th>Date</th>
+    </tr></thead><tbody>`;
+
+  results.forEach(r => {
+    const roll = r.rollNo || r['Roll No'] || '';
+    const name = r.name || r.Name || '';
+    const set = r.set || r.Set || '';
+    const score = r.score || r.Score || 0;
+    const total = r.total || r.Total || '';
+    const grade = r.grade || r.Grade || '';
+    const status = r.status || r.Status || '';
+    const date = r.date || r.Date || '';
+    const d = date ? new Date(date).toLocaleDateString() : '';
+    html += `<tr><td>${roll}</td><td>${name}</td><td>${set}</td><td>${score}/${total}</td><td>${grade}</td><td>${status}</td><td>${d}</td></tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  document.getElementById('dashContent').innerHTML = html;
+}
+</script>
+</body>
+</html>
